@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29326.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imageOperations", "imageOperations\imageOperations.csproj", "{25096271-446E-40CA-8D42-F1657A1041ED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25096271-446E-40CA-8D42-F1657A1041ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25096271-446E-40CA-8D42-F1657A1041ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25096271-446E-40CA-8D42-F1657A1041ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25096271-446E-40CA-8D42-F1657A1041ED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39CE39C0-9E1E-485B-BF9B-5BBC57721E3C}
+	EndGlobalSection
+EndGlobal
