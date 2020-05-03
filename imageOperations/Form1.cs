@@ -1,38 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.Structure;
-
-
 
 namespace imageOperations
 {
     public partial class Form1 : Form
     {
-
-        Bitmap bmp = new Bitmap(800, 500);
-        Image<Bgr, byte> imgInput;
+        Bitmap[] ExtFaces;
+        int faceNo = 0;
+        private Bitmap bmp = new Bitmap(800, 500);
+        private Image<Bgr, byte> imgInput;
 
         public Form1()
         {
             InitializeComponent();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            listView1.View = View.Details;
+            listView1.Columns.Add("", 150);
+            listView1.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.HeaderSize);
+        }
 
-        private void buttonExit_Click(object sender, EventArgs e)
+        private void ButtonExit_Click(object sender, EventArgs e)
         {
             Environment.Exit(0);    //TurnOff Aplication
         }
 
-        private void buttonUploadImage_Click(object sender, EventArgs e)
+        private void ButtonUploadImage_Click(object sender, EventArgs e)
         {
             try
             {
@@ -44,6 +44,8 @@ namespace imageOperations
                     textBoxFileName.Text = dialog.FileName;
                     labelResolution.Text = pictureBox.Width.ToString() + " X " + pictureBox.Height.ToString();
                     this.Refresh();
+                    labelPersonNumber.Text = "0";
+                    listView1.Items.Clear();
                 }
                 else
                 {
@@ -56,27 +58,27 @@ namespace imageOperations
             }
         }
 
-
-        private void buttonGrayScale_Click(object sender, EventArgs e)
+        private void ButtonGrayScale_Click(object sender, EventArgs e)
         {
             if (bmp != null)
             {
                 // bmp refresh
                 bmp = (Bitmap)Bitmap.FromFile(textBoxFileName.Text);
-                grayImage();
+                GrayImage();
                 pictureBox.Image = bmp;
                 this.Refresh();
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
             }
         }
 
-        private void buttonBitmap_Click(object sender, EventArgs e)
+        private void ButtonBitmap_Click(object sender, EventArgs e)
         {
             if (bmp != null)
             {
                 // bmp refresh
                 bmp = (Bitmap)Bitmap.FromFile(textBoxFileName.Text);
                 int threshold = Convert.ToInt32(numericThreshold.Text);
-                
 
                 for (int y = 0; y < bmp.Height; y++)
                 {
@@ -101,25 +103,27 @@ namespace imageOperations
                 }
                 pictureBox.Image = bmp;
                 this.Refresh();
-            }       
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
+            }
         }
 
-
-        private void buttonReset_Click(object sender, EventArgs e)
+        private void ButtonReset_Click(object sender, EventArgs e)
         {
             if (bmp != null)
             {
                 bmp = (Bitmap)Bitmap.FromFile(textBoxFileName.Text);
                 pictureBox.Image = bmp;
                 this.Refresh();
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
             }
         }
-        
-        private void buttonBorderDetection_Click(object sender, EventArgs e)
+
+        private void ButtonBorderDetection_Click(object sender, EventArgs e)
         {
             if (bmp != null)
             {
-
                 int threshold = Convert.ToInt32(numericThreshold.Text);
                 int[,] IpikselXY = new int[bmp.Width, bmp.Height];
                 // bmp refresh
@@ -145,7 +149,6 @@ namespace imageOperations
                 {
                     for (int x = 1; x < bmp.Width - 1; x++)
                     {
-
                         int IpikselX = (IpikselXY[(x + 1), y] - IpikselXY[(x - 1), y]) / 2;
                         int IpikselY = (IpikselXY[x, (y + 1)] - IpikselXY[x, (y - 1)]) / 2;
                         int IpikselGradient = Convert.ToInt32(Math.Sqrt(Math.Pow(IpikselX, 2) + Math.Pow(IpikselY, 2)));
@@ -160,14 +163,14 @@ namespace imageOperations
                         }
                     }
                 }
-
                 pictureBox.Image = bmp;
                 this.Refresh();
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
             }
         }
 
-
-        public void grayImage()
+        public void GrayImage()
         {
             for (int y = 0; y < bmp.Height; y++)
             {
@@ -184,17 +187,43 @@ namespace imageOperations
             }
         }
 
-        private void buttonFaceDetection_Click(object sender, EventArgs e)
+        private void ButtonFaceDetection_Click(object sender, EventArgs e)
         {
             try
             {
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
                 imgInput = new Image<Bgr, byte>(textBoxFileName.Text);
                 if (imgInput == null)
                 {
                     throw new Exception("Please select and image");
                 }
 
-                detectFaceHaar();
+                DetectFaceHaar();
+                listView1.Items.Clear();
+                Populate();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void ButtonEyeDetection_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
+                imgInput = new Image<Bgr, byte>(textBoxFileName.Text);
+                if (imgInput == null)
+                {
+                    throw new Exception("Please select and image");
+                }
+                DetectEyeHaar();
+                Populate();
             }
             catch (Exception ex)
             {
@@ -202,17 +231,19 @@ namespace imageOperations
             }
         }
 
-        private void buttonEyeDetection_Click(object sender, EventArgs e)
+        private void ButtonFaceEye_Click(object sender, EventArgs e)
         {
             try
             {
+                labelPersonNumber.Text = "0";
+                listView1.Items.Clear();
                 imgInput = new Image<Bgr, byte>(textBoxFileName.Text);
                 if (imgInput == null)
                 {
                     throw new Exception("Please select and image");
                 }
-
-                detectEyeHaar();
+                DetectFaceEyeHaar();
+                Populate();
             }
             catch (Exception ex)
             {
@@ -220,29 +251,8 @@ namespace imageOperations
             }
         }
 
-        private void buttonFaceEye_Click(object sender, EventArgs e)
+        public void DetectFaceHaar()
         {
-            try
-            {
-                imgInput = new Image<Bgr, byte>(textBoxFileName.Text);
-                if (imgInput == null)
-                {
-                    throw new Exception("Please select and image");
-                }
-
-                detectFaceEyeHaar();
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-
-        public void detectFaceHaar()
-        {
-
             try
             {
                 int personNumber = 0;
@@ -250,7 +260,7 @@ namespace imageOperations
 
                 CascadeClassifier classifierFace = new CascadeClassifier(facePath);
 
-                var imgGray = imgInput.Convert<Gray, byte>().Clone();
+                var imgGray = imgInput.Convert<Gray, byte>().Clone();//
                 double scale = Convert.ToDouble(textBoxScale.Text);
                 int neig = Convert.ToInt32(numericNeig.Value);
                 int border = Convert.ToInt32(numericBorder.Value);
@@ -260,12 +270,25 @@ namespace imageOperations
                 b = Convert.ToDouble(panelBorderColor.BackColor.B);
 
                 Rectangle[] faces = classifierFace.DetectMultiScale(imgGray, scale, neig);
-                foreach (var face in faces)
+                if (faces.Length > 0)
                 {
-                    personNumber += 1;
-                    imgInput.Draw(face, new Bgr(b, g, r), border);
+                    Bitmap bmpInput = imgGray.ToBitmap();
+                    Bitmap ExtractedFace; // empty
+                    Graphics FaceCanvas;
+                    ExtFaces = new Bitmap[faces.Length];
+                    faceNo = 0;
+                    foreach (var face in faces)
+                    {
+                        personNumber += 1;
+                        imgInput.Draw(face, new Bgr(b, g, r), border);
+                        ExtractedFace = new Bitmap(face.Width, face.Height);
+                        FaceCanvas = Graphics.FromImage(ExtractedFace);
+                        FaceCanvas.DrawImage(bmpInput, 0, 0, face, GraphicsUnit.Pixel);
+                        ExtFaces[faceNo] = ExtractedFace;
+                        faceNo++;
+                    }
+                    pictureBox.Image = imgInput.Bitmap;
                 }
-                pictureBox.Image = imgInput.Bitmap;
                 labelPersonNumber.Text = Convert.ToString(personNumber);
             }
             catch (Exception ex)
@@ -274,7 +297,7 @@ namespace imageOperations
             }
         }
 
-        public void detectEyeHaar()
+        public void DetectEyeHaar()
         {
             try
             {
@@ -295,22 +318,35 @@ namespace imageOperations
                 b = Convert.ToDouble(panelBorderColor.BackColor.B);
 
                 Rectangle[] faces = classifierFace.DetectMultiScale(imgGray, scale, neig);
-                foreach (var face in faces)
+                if (faces.Length > 0)
                 {
-                    
-                    personNumber += 1;
-                    imgGray.ROI = face;
-                    Rectangle[] eyes = classifierEye.DetectMultiScale(imgGray, scale, neig);
-                    foreach (var eye in eyes)
+                    Bitmap bmpInput = imgGray.ToBitmap();
+                    Graphics FaceCanvas;
+                    ExtFaces = new Bitmap[faces.Length];
+                    Bitmap ExtractedFace; // empty
+                    faceNo = 0;
+                    foreach (var face in faces)
                     {
-                        var e = eye;
-                        e.X += face.X;
-                        e.Y += face.Y;
-                        imgInput.Draw(e, new Bgr(b, g, r), border);
+                        personNumber += 1;
+                        ExtractedFace = new Bitmap(face.Width, face.Height);
+                        FaceCanvas = Graphics.FromImage(ExtractedFace);
+                        FaceCanvas.DrawImage(bmpInput, 0, 0, face, GraphicsUnit.Pixel);
+                        ExtFaces[faceNo] = ExtractedFace;
+                        faceNo++;
+
+                        imgGray.ROI = face;
+                        Rectangle[] eyes = classifierEye.DetectMultiScale(imgGray, scale, neig);
+                        foreach (var eye in eyes)
+                        {
+                            var Eye = eye;
+                            Eye.X += face.X;
+                            Eye.Y += face.Y;
+                            imgInput.Draw(Eye, new Bgr(0, 255, 0), border);
+                        }
                     }
+                    pictureBox.Image = imgInput.Bitmap;
+                    labelPersonNumber.Text = Convert.ToString(personNumber);
                 }
-                labelPersonNumber.Text = Convert.ToString(personNumber);
-                pictureBox.Image = imgInput.Bitmap;
             }
             catch (Exception ex)
             {
@@ -318,7 +354,7 @@ namespace imageOperations
             }
         }
 
-        public void detectFaceEyeHaar()
+        public void DetectFaceEyeHaar()
         {
             try
             {
@@ -339,22 +375,37 @@ namespace imageOperations
                 b = Convert.ToDouble(panelBorderColor.BackColor.B);
 
                 Rectangle[] faces = classifierFace.DetectMultiScale(imgGray, scale, neig);
-                foreach (var face in faces)
+                if (faces.Length > 0)
                 {
-                    imgInput.Draw(face, new Bgr(0, 0, 255), border);
-                    personNumber += 1;
-                    imgGray.ROI = face;
-                    Rectangle[] eyes = classifierEye.DetectMultiScale(imgGray, scale, neig);
-                    foreach (var eye in eyes)
+                    Bitmap bmpInput = imgGray.ToBitmap();
+                    Graphics FaceCanvas;
+                    ExtFaces = new Bitmap[faces.Length];
+                    Bitmap ExtractedFace; // empty
+                    faceNo = 0;
+                    foreach (var face in faces)
                     {
-                        var e = eye;
-                        e.X += face.X;
-                        e.Y += face.Y;
-                        imgInput.Draw(e, new Bgr(0, 255, 0), border);
+                        personNumber += 1;
+                        imgInput.Draw(face, new Bgr(0, 0, 255), border);
+
+                        ExtractedFace = new Bitmap(face.Width, face.Height);
+                        FaceCanvas = Graphics.FromImage(ExtractedFace);
+                        FaceCanvas.DrawImage(bmpInput, 0, 0, face, GraphicsUnit.Pixel);
+                        ExtFaces[faceNo] = ExtractedFace;
+                        faceNo++;
+
+                        imgGray.ROI = face;
+                        Rectangle[] eyes = classifierEye.DetectMultiScale(imgGray, scale, neig);
+                        foreach (var eye in eyes)
+                        {
+                            var e = eye;
+                            e.X += face.X;
+                            e.Y += face.Y;
+                            imgInput.Draw(e, new Bgr(0, 255, 0), border);
+                        }
                     }
+                    pictureBox.Image = imgInput.Bitmap;
+                    labelPersonNumber.Text = Convert.ToString(personNumber);
                 }
-                labelPersonNumber.Text = Convert.ToString(personNumber);
-                pictureBox.Image = imgInput.Bitmap;
             }
             catch (Exception ex)
             {
@@ -362,8 +413,7 @@ namespace imageOperations
             }
         }
 
-
-        private void textBoxScale_KeyPress(object sender, KeyPressEventArgs e)
+        private void TextBoxScale_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (Char.IsDigit(e.KeyChar)) return;
             if (Char.IsControl(e.KeyChar)) return;
@@ -372,19 +422,26 @@ namespace imageOperations
             e.Handled = true;
         }
 
-        private void panelBorderColor_Click(object sender, EventArgs e)
+        private void PanelBorderColor_Click(object sender, EventArgs e)
         {
             ColorDialog Color = new ColorDialog();
             Color.ShowDialog();
             panelBorderColor.BackColor = Color.Color;
         }
+
+        private void Populate()
+        {
+            ImageList imgs = new ImageList
+            {
+                ImageSize = new Size(150, 150)
+            };
+
+            for (int i = 0; i < ExtFaces.Length; i++)
+            {
+                imgs.Images.Add(ExtFaces[i]);
+                listView1.Items.Add("" + (i + 1) + " yüz", i);
+            }
+            listView1.SmallImageList = imgs;
+        }
     }
 }
-    //  Batuhan Güneş  
-    //  201513171055
-
-    //  Muhammed Emin Berkay Kocaoğlu
-    //  201513171070
-
-    //  Tutku Argun
-    //  201513171010
