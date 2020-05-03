@@ -8,6 +8,13 @@ Bu proje, önceden çekilmiş herhangi bir fotoğraf üzerinde yüz tespiti yapa
 Projenin oluşturulma tarihi : Ekim 2019
 `
 
+## Screenshots
+
+<img align="center" src="https://github.com/BatuhanGunes/FaceRecognition/blob/master/Screenshots/FaceAndEye.png"> 
+<img align="center" src="https://github.com/BatuhanGunes/FaceRecognition/blob/master/Screenshots/Face.png"> 
+<img align="center" src="https://github.com/BatuhanGunes/FaceRecognition/blob/master/Screenshots/Eye.png"> 
+<img align="center" src="https://github.com/BatuhanGunes/FaceRecognition/blob/master/Screenshots/FaceTeam.png"> 
+
 ## Başlangıç
 
 Projeyi çalıştırabilmek için proje dosyalarının bir kopyasını yerel makinenize indirin. Gerekli kütüphanelerin kurulumunu gerçekleştirin. Gerekli ortamları edindikten sonra projeyi bu ortamda açarak çalıştırabilir ve çalıştırıldıktan sonra açılan pencere üzerinden uygulamayı kullanabilirsiniz. İkinci kez çalıştırılmak istenildiğinde, projenin bulunduğu konumda ~\imageOperations\bin\Debug\imageOperations.exe dosyasını çalıştırmanız yeterli olacaktır.
